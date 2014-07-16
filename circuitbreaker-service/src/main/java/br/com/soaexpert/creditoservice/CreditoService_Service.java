@@ -17,7 +17,7 @@ import javax.xml.ws.WebServiceFeature;
  * Generated source version: 2.2
  * 
  */
-@WebServiceClient(name = "CreditoService", targetNamespace = "http://soaexpert.com.br/CreditoService/", wsdlLocation = "file:/Users/leonardogaona/AnypointStudio/workspace_treinamento/analisecredito/src/main/resources/Contracts/CreditoService.wsdl")
+@WebServiceClient(name = "CreditoService", targetNamespace = "http://soaexpert.com.br/CreditoService/", wsdlLocation = "file:/Users/leonardogaona/workspace_/circuitbreaker/circuitbreaker-service/src/main/resources/contracts/CreditoService.wsdl")
 public class CreditoService_Service
     extends Service
 {
@@ -30,7 +30,7 @@ public class CreditoService_Service
         URL url = null;
         WebServiceException e = null;
         try {
-            url = new URL("file:/Users/leonardogaona/AnypointStudio/workspace_treinamento/analisecredito/src/main/resources/Contracts/CreditoService.wsdl");
+            url = new URL("file:/Users/leonardogaona/workspace_/circuitbreaker/circuitbreaker-service/src/main/resources/contracts/CreditoService.wsdl");
         } catch (MalformedURLException ex) {
             e = new WebServiceException(ex);
         }

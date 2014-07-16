@@ -7,96 +7,10 @@
 	name="CreditoService"
 	targetNamespace="http://soaexpert.com.br/CreditoService/">
 	<wsdl:types>
-		<xsd:schema
-			targetNamespace="http://soaexpert.com.br/CreditoService/"
-			xmlns:Q1="http://soaexpert.com.br/domain">
+		<xsd:schema>
 			<xsd:import
-				schemaLocation="../schemas/DomainModel.xsd"
-				namespace="http://soaexpert.com.br/domain" />
-			<xsd:element name="verificaCreditoSerasa">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element
-							name="empresa"
-							type="Q1:Empresa" />
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-			<xsd:element name="verificaCreditoSerasaResponse">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element
-							name="credito"
-							type="Q1:Credito" />
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-			<xsd:element name="verificaCreditoSerasaFault">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element
-							name="verificaCreditoFault"
-							type="xsd:string">
-						</xsd:element>
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-			<xsd:element name="verificaCreditoSPC">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element
-							name="empresa"
-							type="Q1:Empresa" />
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-			<xsd:element name="verificaCreditoSPCResponse">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element
-							name="credito"
-							type="Q1:Credito" />
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-			<xsd:element name="verificaCreditoSPCFault">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element
-							name="verificaCreditoSPCFault"
-							type="xsd:string">
-						</xsd:element>
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-			<xsd:element name="verificaCreditoCasasBahia">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element
-							name="empresa"
-							type="Q1:Empresa" />
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-			<xsd:element name="verificaCreditoCasasBahiaResponse">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element
-							name="credito"
-							type="Q1:Credito" />
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-			<xsd:element name="verificaCreditoCasasBahiaFault">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element
-							name="verificaCreditoCasasBahiaFault"
-							type="xsd:string">
-						</xsd:element>
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
+				namespace="http://soaexpert.com.br/CreditoService/"
+				schemaLocation="CreditoService.xsd" />
 		</xsd:schema>
 	</wsdl:types>
 	<wsdl:message name="verificaCreditoSerasaRequest">

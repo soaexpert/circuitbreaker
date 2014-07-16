@@ -34,11 +34,11 @@ public interface CreditoService {
      * @throws VerificaCreditoSerasaFault_Exception
      */
     @WebMethod(action = "http://www.soaexpert.com.br/CreditoService/verificaCreditoSerasa")
-    @WebResult(name = "credito", targetNamespace = "")
+    @WebResult(name = "credito", targetNamespace = "http://soaexpert.com.br/CreditoService/")
     @RequestWrapper(localName = "verificaCreditoSerasa", targetNamespace = "http://soaexpert.com.br/CreditoService/", className = "br.com.soaexpert.creditoservice.VerificaCreditoSerasa")
     @ResponseWrapper(localName = "verificaCreditoSerasaResponse", targetNamespace = "http://soaexpert.com.br/CreditoService/", className = "br.com.soaexpert.creditoservice.VerificaCreditoSerasaResponse")
     public Credito verificaCreditoSerasa(
-        @WebParam(name = "empresa", targetNamespace = "")
+        @WebParam(name = "empresa", targetNamespace = "http://soaexpert.com.br/CreditoService/")
         Empresa empresa)
         throws VerificaCreditoSerasaFault_Exception
     ;
@@ -51,11 +51,11 @@ public interface CreditoService {
      * @throws VerificaCreditoSPCFault_Exception
      */
     @WebMethod(action = "http://www.soaexpert.com.br/CreditoService/verificaCreditoSPC")
-    @WebResult(name = "credito", targetNamespace = "")
+    @WebResult(name = "credito", targetNamespace = "http://soaexpert.com.br/CreditoService/")
     @RequestWrapper(localName = "verificaCreditoSPC", targetNamespace = "http://soaexpert.com.br/CreditoService/", className = "br.com.soaexpert.creditoservice.VerificaCreditoSPC")
     @ResponseWrapper(localName = "verificaCreditoSPCResponse", targetNamespace = "http://soaexpert.com.br/CreditoService/", className = "br.com.soaexpert.creditoservice.VerificaCreditoSPCResponse")
     public Credito verificaCreditoSPC(
-        @WebParam(name = "empresa", targetNamespace = "")
+        @WebParam(name = "empresa", targetNamespace = "http://soaexpert.com.br/CreditoService/")
         Empresa empresa)
         throws VerificaCreditoSPCFault_Exception
     ;
@@ -68,11 +68,11 @@ public interface CreditoService {
      * @throws VerificaCreditoCasasBahiaFault_Exception
      */
     @WebMethod(action = "http://www.soaexpert.com.br/CreditoService/verificaCreditoCasasBahia")
-    @WebResult(name = "credito", targetNamespace = "")
+    @WebResult(name = "credito", targetNamespace = "http://soaexpert.com.br/CreditoService/")
     @RequestWrapper(localName = "verificaCreditoCasasBahia", targetNamespace = "http://soaexpert.com.br/CreditoService/", className = "br.com.soaexpert.creditoservice.VerificaCreditoCasasBahia")
     @ResponseWrapper(localName = "verificaCreditoCasasBahiaResponse", targetNamespace = "http://soaexpert.com.br/CreditoService/", className = "br.com.soaexpert.creditoservice.VerificaCreditoCasasBahiaResponse")
     public Credito verificaCreditoCasasBahia(
-        @WebParam(name = "empresa", targetNamespace = "")
+        @WebParam(name = "empresa", targetNamespace = "http://soaexpert.com.br/CreditoService/")
         Empresa empresa)
         throws VerificaCreditoCasasBahiaFault_Exception
     ;
