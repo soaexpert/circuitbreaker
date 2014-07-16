@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns="http://camel.apache.org/schema/spring" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	 http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring-2.13.1.xsd
+	">
+
+
+
+
+	<camelContext id="camel">
+
+
+		<route>
+			<from uri="cxfrs://bean://restServices" />
+			<process ref="router" />
+			<recipientList>
+				<header>Route</header>
+			</recipientList>
+		</route>
+
+		<route>
+			<from uri="direct://healthService/GET" />
+			<setBody>
+				<simple>OK</simple>
+			</setBody>
+			<to uri="rabbitmq://localhost:5672/teste?username=guest&amp;password=guest" />
+		</route>
+		
+		<route>
+			<from uri="direct://circuitService/POST" />
+			<setBody>
+				<groovy>
+					return javax.ws.rs.core.Response.ok().build();				
+				</groovy>
+			</setBody>
+			<to uri="rabbitmq://localhost:5672/teste?username=guest&amp;password=guest" />
+		</route>
+
+		<route>
+			<from uri="rabbitmq://localhost:5672/teste?username=guest&amp;password=guest" />
+			<to uri="etcd://http://localhost:4001?mode=list" />
+			<setBody>
+				<simple>${body.node}</simple>
+			</setBody>
+			<log message="${body}" />
+		</route>
+
+	</camelContext>
+
+</beans:beans>

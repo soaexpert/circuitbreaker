@@ -1,0 +1,24 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+	config.vm.hostname = "rabbit"
+	config.vm.box = "precise64"
+	config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+
+	config.vm.network :forwarded_port, guest: 5672, host: 5672 #RabbitMQ
+
+	config.vm.provision :puppet do |puppet|
+	  puppet.manifests_path = "puppet/manifests"
+	  puppet.module_path = "puppet/modules"
+	end
+  
+	config.vm.provider :virtualbox do |v|
+		v.customize ["modifyvm", :id,
+                  "--name", "rabbit",
+                  "--memory", "768",
+                  # Enable DNS behind NAT
+                  "--natdnshostresolver1", "on"]
+	end
+
+end
