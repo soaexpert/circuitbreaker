@@ -1,5 +1,8 @@
 package br.com.soaexpert.circuitbreaker.services;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class CircuitData {
 	
 	private String circuitName;

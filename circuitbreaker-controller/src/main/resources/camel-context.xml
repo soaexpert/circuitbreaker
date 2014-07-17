@@ -7,6 +7,9 @@
 
 
 
+	<beans:bean id="gson"
+		class="org.apache.camel.component.gson.GsonDataFormat" />
+
 
 	<camelContext id="camel">
 
@@ -24,27 +27,335 @@
 			<setBody>
 				<simple>OK</simple>
 			</setBody>
-			<to uri="rabbitmq://localhost:5672/teste?username=guest&amp;password=guest" />
-		</route>
-		
-		<route>
-			<from uri="direct://circuitService/POST" />
-			<setBody>
-				<groovy>
-					return javax.ws.rs.core.Response.ok().build();				
-				</groovy>
-			</setBody>
-			<to uri="rabbitmq://localhost:5672/teste?username=guest&amp;password=guest" />
 		</route>
 
 		<route>
-			<from uri="rabbitmq://localhost:5672/teste?username=guest&amp;password=guest" />
-			<to uri="etcd://http://localhost:4001?mode=list" />
-			<setBody>
-				<simple>${body.node}</simple>
-			</setBody>
-			<log message="${body}" />
+			<from uri="direct://circuitService/GET" />
+			<setHeader headerName="recipient">
+				<simple>etcd://http://localhost:4001?key=${body}.circuit&amp;mode=get</simple>
+			</setHeader>			
+			<recipientList>
+				<header>recipient</header>
+			</recipientList>
+			<log message="Test got response: ${body}"></log>
+			<choice>
+				<when>
+					<groovy>return exchange.in.body != null &amp;&amp; exchange.in.body.node.value.equals("OPEN"); </groovy>
+					<setBody>
+						<groovy>return javax.ws.rs.core.Response.status(503).build();</groovy>
+					</setBody>
+				</when>
+				<otherwise>
+					<setBody>
+						<groovy>return javax.ws.rs.core.Response.ok().build();</groovy>
+					</setBody>
+				</otherwise>
+			</choice>
 		</route>
+
+		<route>
+			<from uri="direct://circuitService/POST" />
+			<setBody>
+				<simple>${body[0]}</simple>
+			</setBody>
+			<to uri="seda:circuitDataFeed" />
+			<setBody>
+				<groovy>return javax.ws.rs.core.Response.ok().build();</groovy>
+			</setBody>
+		</route>
+
+		<route>
+			<from
+				uri="rabbitmq://localhost:5672/teste?username=guest&amp;password=guest" />
+			<to uri="seda:circuitDataFeed" />
+		</route>
+
+
+		<route>
+			<from uri="seda:circuitDataFeed" />
+			<choice>
+				<when>
+					<xpath>/circuitData/requestSuccessful = 'false'</xpath>
+					<setProperty propertyName="etcdUrl">
+						<simple>etcd://http://localhost:4001?key=${body.circuitName}/${exchangeId}&amp;ttl=30</simple>
+					</setProperty>
+					<marshal ref="gson" />
+					<recipientList>
+						<property>etcdUrl</property>
+					</recipientList>
+				</when>
+				<otherwise>
+					<setProperty propertyName="originalBody">
+						<simple>${body}</simple>
+					</setProperty>
+					<marshal ref="gson" />
+					<setBody>
+						<groovy>
+							com.justinsb.etcd.EtcdResult result = new com.justinsb.etcd.EtcdResult();
+							com.justinsb.etcd.EtcdNode node = new com.justinsb.etcd.EtcdNode();
+							node.key = "/" +  exchange.properties['originalBody'].circuitName + "/" + exchange.exchangeId;
+							node.value = new java.lang.String(exchange.in.body);
+							result.node = node;
+							return result;
+						</groovy>
+					
+					</setBody>
+				
+				
+				
+					<setProperty propertyName="changedKey">
+						<simple>${body}</simple>
+					</setProperty>
+					<to uri="direct:getCircuitState" />
+					<when>
+						<simple>${body} == 'HALF-OPEN'</simple>
+						<setBody>
+							<property>changedKey</property>
+						</setBody>
+						<to uri="direct:getCircuitSize" />
+						<choice>
+							<when>
+								<simple>${body} == 0</simple>
+								<to uri="direct:enableCircuit" />
+							</when>
+						</choice>
+					</when>
+				</otherwise>
+			</choice>
+		</route>
+
+		<route>
+			<from uri="etcd://http://localhost:4001" />
+			<log message="Key change: ${body}" />
+			<setProperty propertyName="changedKey">
+				<simple>${body}</simple>
+			</setProperty>
+			<choice>
+				<when>
+					<groovy>return body.action.equals("set") &amp;&amp; !body.node.key.endsWith(".circuit");</groovy>
+					<to uri="direct:getCircuitState" />
+					<choice>
+						<when>
+							<simple>${body} == 'CLOSED'</simple>
+							<setBody>
+								<property>changedKey</property>
+							</setBody>
+							<to uri="direct:getCircuitSize" />
+							<choice>
+								<when>
+									<simple>${body} &gt; 5</simple>
+									<to uri="direct:disableCircuit" />
+								</when>
+							</choice>
+						</when>
+						<when>
+							<simple>${body} == 'HALF-OPEN'</simple>
+							<setBody>
+								<property>changedKey</property>
+							</setBody>
+							<to uri="direct:getCircuitSize" />
+							<choice>
+								<when>
+									<simple>${body} &gt; 0</simple>
+									<to uri="direct:disableCircuit" />
+								</when>
+							</choice>
+						</when>
+					</choice>
+
+				</when>
+				<when>
+					<groovy>return body.action.equals("expire");</groovy>
+					<to uri="direct:getCircuitState" />
+					<choice>
+						<when>
+							<simple>${body} == 'OPEN'</simple>
+							<setBody>
+								<property>changedKey</property>
+							</setBody>
+							<to uri="direct:getCircuitSize" />
+							<choice>
+								<when>
+									<simple>${body} == 0</simple>
+									<to uri="direct:tempEnableCircuit" />
+								</when>
+							</choice>
+						</when>
+
+
+
+					</choice>
+				</when>
+			</choice>
+
+
+
+
+		</route>
+
+
+		<route>
+			<from uri="direct:getCircuitState" />
+			<setHeader headerName="recipient">
+				<groovy>return "etcd://http://localhost:4001?mode=get&amp;key=" + org.apache.commons.lang3.StringUtils.substringBetween(body.node.key, "/") + ".circuit";</groovy>
+			</setHeader>
+			<recipientList>
+				<header>recipient</header>
+			</recipientList>
+
+			<choice>
+				<when>
+					<groovy>return body == null;</groovy>
+					<setBody>
+						<simple>CLOSED</simple>
+					</setBody>
+				</when>
+				<otherwise>
+					<setBody>
+						<groovy>return body.node.value;</groovy>
+					</setBody>
+				</otherwise>
+			</choice>
+
+			<log message="Circuit is ${body}" />
+		</route>
+
+		<route>
+			<from uri="direct:getCircuitSize" />
+			<setHeader headerName="recipient">
+				<groovy>return "etcd://http://localhost:4001?mode=get&amp;key=" + org.apache.commons.lang3.StringUtils.substringBetween(body.node.key, "/")</groovy>
+			</setHeader>
+			<recipientList>
+				<header>recipient</header>
+			</recipientList>
+			<setBody>
+				<groovy>if (body.node.nodes == null) {
+							return 0;
+						}
+						else {
+							return body.node.nodes.size();
+						}
+				</groovy>
+			</setBody>
+			<log message="Circuit size is ${body}" />
+		</route>
+
+		<route>
+
+			<from uri="direct:disableCircuit" />
+
+			<setBody>
+				<property>changedKey</property>
+			</setBody>
+			<convertBodyTo type="com.justinsb.etcd.EtcdResult" />
+			<log message="About to open circuit: ${body} " />
+			<setBody>
+				<groovy>return body.node.value;</groovy>
+			</setBody>
+			<unmarshal ref="gson" />
+			<setHeader headerName="circuitData">
+				<simple>${body}</simple>
+			</setHeader>
+			<setHeader headerName="recipient">
+				<groovy>return exchange.in.headers['circuitData'].disableCircuitURL</groovy>
+			</setHeader>
+			<setBody>
+				<simple>${null}</simple>
+			</setBody>
+			<log message="Invoking: ${header.recipient} " />
+			<recipientList>
+				<header>recipient</header>
+			</recipientList>
+
+			<setBody>
+				<simple>OPEN</simple>
+			</setBody>
+			<setHeader headerName="recipient">
+				<groovy>return "etcd://http://localhost:4001?key=" + exchange.in.headers['circuitData'].circuitName + ".circuit" ;</groovy>
+			</setHeader>
+			<log message="And now, invoking: ${header.recipient} " />
+			<recipientList>
+				<header>recipient</header>
+			</recipientList>
+			<log message="Circuit opened"></log>
+		</route>
+
+		<route>
+			<from uri="direct:tempEnableCircuit" />
+			<setBody>
+				<property>changedKey</property>
+			</setBody>
+			<convertBodyTo type="com.justinsb.etcd.EtcdResult" />
+			<log message="About to half-open circuit: ${body} " />
+			<setBody>
+				<groovy>return body.prevNode.value;</groovy>
+			</setBody>
+			<unmarshal ref="gson" />
+			<setHeader headerName="circuitData">
+				<simple>${body}</simple>
+			</setHeader>
+			<setHeader headerName="recipient">
+				<groovy>return exchange.in.headers['circuitData'].enableCircuitURL</groovy>
+			</setHeader>
+			<setBody>
+				<simple>${null}</simple>
+			</setBody>
+			<log message="Invoking: ${header.recipient} " />
+			<recipientList>
+				<header>recipient</header>
+			</recipientList>
+
+			<setBody>
+				<simple>HALF-OPEN</simple>
+			</setBody>
+			<setHeader headerName="recipient">
+				<groovy>return "etcd://http://localhost:4001?key=" + exchange.in.headers['circuitData'].circuitName + ".circuit" ;</groovy>
+			</setHeader>
+			<log message="And now, invoking: ${header.recipient} " />
+			<recipientList>
+				<header>recipient</header>
+			</recipientList>
+			<log message="Circuit half-opened"></log>
+		</route>
+
+		<route>
+			<from uri="direct:enableCircuit" />
+			<setBody>
+				<property>changedKey</property>
+			</setBody>
+			<convertBodyTo type="com.justinsb.etcd.EtcdResult" />
+			<log message="About to close circuit: ${body} " />
+			<setBody>
+				<groovy>return body.node.value;</groovy>
+			</setBody>
+			<unmarshal ref="gson" />
+			<setHeader headerName="circuitData">
+				<simple>${body}</simple>
+			</setHeader>
+			<setHeader headerName="recipient">
+				<groovy>return exchange.in.headers['circuitData'].enableCircuitURL</groovy>
+			</setHeader>
+			<setBody>
+				<simple>${null}</simple>
+			</setBody>
+			<log message="Invoking: ${header.recipient} " />
+			<recipientList>
+				<header>recipient</header>
+			</recipientList>
+
+			<setBody>
+				<simple>CLOSED</simple>
+			</setBody>
+			<setHeader headerName="recipient">
+				<groovy>return "etcd://http://localhost:4001?key=" + exchange.in.headers['circuitData'].circuitName + ".circuit" ;</groovy>
+			</setHeader>
+			<log message="And now, invoking: ${header.recipient} " />
+			<recipientList>
+				<header>recipient</header>
+			</recipientList>
+			<log message="Circuit closed"></log>
+		</route>
+
 
 	</camelContext>
 
