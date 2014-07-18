@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Q1:loteNotaFiscal
+	xmlns:Q1="http://soaexpert.com.br/domain"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://soaexpert.com.br/domain Domain.xsd ">
+	<Q1:codigo>10</Q1:codigo>
+	<Q1:quantidade>2</Q1:quantidade>
+</Q1:loteNotaFiscal>

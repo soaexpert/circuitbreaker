@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema
+	xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://soaexpert.com.br/CreditoService/"
+	xmlns:tns="http://soaexpert.com.br/CreditoService/"
+	xmlns:dom="http://soaexpert.com.br/domain"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified">
+	<xsd:import
+		schemaLocation="../schemas/DomainModel.xsd"
+		namespace="http://soaexpert.com.br/domain" />
+	<xsd:element name="verificaCredito">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element
+					name="empresa"
+					type="dom:Empresa" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="verificaCreditoResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element
+					name="credito"
+					type="dom:Credito" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="verificaCreditoSerasaFault">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element
+					name="verificaCreditoFault"
+					type="xsd:string">
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="verificaCreditoSPCFault">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element
+					name="verificaCreditoSPCFault"
+					type="xsd:string">
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="verificaCreditoCasasBahiaFault">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element
+					name="verificaCreditoCasasBahiaFault"
+					type="xsd:string">
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</schema>

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule
+	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
+	xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper"
+	xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
+	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	version="EE-3.5.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/data-mapper http://www.mulesoft.org/schema/mule/ee/data-mapper/current/mule-data-mapper.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+
+	<mulexml:namespace-manager includeConfigNamespaces="false">
+		<mulexml:namespace
+			uri="http://soaexpert.com.br/domain"
+			prefix="dom" />
+		<mulexml:namespace
+			uri="http://soaexpert.com.br/CreditoService/"
+			prefix="cred" />
+	</mulexml:namespace-manager>
+	<ws:consumer-config
+		name="CreditoServiceImpl"
+		wsdlLocation="contracts/CreditoService.wsdl"
+		service="CreditoService"
+		port="CreditoServiceSOAP"
+		serviceAddress="http://localhost:8099/CreditoService"
+		doc:name="Web Service Consumer" />
+	<mulexml:jaxb-context
+		name="JAXB_Context"
+		packageNames="br.com.soaexpert.creditoservice"
+		doc:name="JAXB Context" />
+	<data-mapper:config
+		name="MapSPC"
+		transformationGraphPath="mapspc.grf"
+		doc:name="MapSPC" />
+	<data-mapper:config
+		name="MapSerasa"
+		transformationGraphPath="mapserasa.grf"
+		doc:name="MapSerasa" />
+	<data-mapper:config
+		name="mapCasasBahia"
+		transformationGraphPath="mapcasasbahia.grf"
+		doc:name="mapCasasBahia" />
+    <catch-exception-strategy name="Catch_Exception_Strategy"/>
+
+	<flow
+		name="verificacaocredito"
+		doc:name="verificacaocredito">
+		<http:inbound-endpoint
+			exchange-pattern="request-response"
+			host="${http.host}"
+			port="${http.port}"
+			path="${http.path}"
+			doc:name="HTTP"
+			responseTimeout="10000000" />
+		<cxf:proxy-service
+			port="CreditoServiceSOAP"
+			namespace="http://soaexpert.com.br/CreditoService/"
+			service="CreditoService"
+			payload="body"
+			wsdlLocation="contracts/CreditoServiceProxy.wsdl"
+			doc:name="CXF" />
+		<mulexml:xml-to-dom-transformer
+			doc:name="XML to DOM"
+			outputEncoding="UTF-8" />
+		<mulexml:dom-to-xml-transformer doc:name="DOM to XML" />
+		<logger
+			message="#[payload]"
+			level="INFO"
+			doc:name="Logger" />
+		<scatter-gather doc:name="Scatter-Gather">
+			<custom-aggregation-strategy class="br.com.soaexpert.credito.components.aggregator.VerificacaoCreditoAggregationStrategy" />
+			<flow-ref
+				name="SPC"
+				doc:name="toSPC" />
+			<flow-ref
+				name="Serasa"
+				doc:name="toSerasa" />
+			<flow-ref
+				name="CasasBahia"
+				doc:name="toCasasBahia" />
+		</scatter-gather>
+		<mulexml:jaxb-object-to-xml-transformer
+			jaxbContext-ref="JAXB_Context"
+			doc:name="JAXB Object to XML" />
+		<mulexml:xml-to-dom-transformer
+			outputEncoding="UTF-8"
+			doc:name="XML to DOM" />
+		<catch-exception-strategy doc:name="Catch Exception Strategy">
+			<message-properties-transformer doc:name="Message Properties">
+				<add-message-property
+					key="http.status"
+					value="500" />
+			</message-properties-transformer>
+			<expression-component doc:name="Expression"><![CDATA[#[payload = '<Fault xmlns="http://schemas.xmlsoap.org/soap/envelope/"><faultcode>S:Server</faultcode><faultstring>Error processing the request. Try again one day...</faultstring></Fault>']]]></expression-component>
+		</catch-exception-strategy>
+
+	</flow>
+	<sub-flow
+		name="SPC"
+		doc:name="SPC">
+		<data-mapper:transform
+			config-ref="MapSPC"
+			doc:name="MapSPC" />
+		<ws:consumer
+			config-ref="CreditoServiceImpl"
+			operation="verificaCreditoSPC"
+			doc:name="SPC" />
+		<mulexml:dom-to-xml-transformer doc:name="DOM to XML" />
+		<mulexml:jaxb-xml-to-object-transformer
+			jaxbContext-ref="JAXB_Context"
+			doc:name="XML to JAXB Object" />
+	</sub-flow>
+	<sub-flow
+		name="Serasa"
+		doc:name="Serasa">
+		<data-mapper:transform
+			config-ref="MapSerasa"
+			doc:name="MapSerasa" />
+		<ws:consumer
+			config-ref="CreditoServiceImpl"
+			operation="verificaCreditoSerasa"
+			doc:name="Serasa" />
+		<mulexml:dom-to-xml-transformer doc:name="DOM to XML" />
+		<mulexml:jaxb-xml-to-object-transformer
+			jaxbContext-ref="JAXB_Context"
+			doc:name="XML to JAXB Object" />
+	</sub-flow>
+	<sub-flow
+		name="CasasBahia"
+		doc:name="CasasBahia">
+		<data-mapper:transform
+			config-ref="mapCasasBahia"
+			doc:name="mapCasasBahia" />
+		<ws:consumer
+			config-ref="CreditoServiceImpl"
+			operation="verificaCreditoCasasBahia"
+			doc:name="Casas Bahia" />
+		<mulexml:dom-to-xml-transformer doc:name="DOM to XML" />
+		<mulexml:jaxb-xml-to-object-transformer
+			jaxbContext-ref="JAXB_Context"
+			doc:name="XML to JAXB Object" />
+	</sub-flow>
+</mule>

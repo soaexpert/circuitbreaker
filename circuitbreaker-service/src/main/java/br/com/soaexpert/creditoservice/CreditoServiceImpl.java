@@ -92,7 +92,7 @@ public class CreditoServiceImpl implements CreditoService {
 
 		Credito credito = new Credito();
 		credito.setEmpresa(empresa);
-		credito.setSerasa(true);
+		credito.setCasasBahia(true);
 
 		return credito;
 	}
