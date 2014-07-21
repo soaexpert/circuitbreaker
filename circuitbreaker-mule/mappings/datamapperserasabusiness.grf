@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph __version="3.5.0" author="leonardogaona" created="Thu Jul 17 15:25:33 BRT 2014" description="MapSPC" guiVersion="3.4.3.P" id="1405624028776" licenseCode="Unlicensed" licenseType="Unknown" modified="Thu Jul 17 15:25:33 BRT 2014" modifiedBy="leonardogaona" name="MapSPC" revision="1.0" showComponentDetails="false">
+<?xml version="1.0" encoding="UTF-8"?><Graph __version="3.5.0" author="leonardogaona" created="Fri Jul 18 16:47:48 BRT 2014" description="dataMapperSerasaBusiness" guiVersion="3.4.3.P" id="1405734809888" licenseCode="Unlicensed" licenseType="Unknown" modified="Fri Jul 18 16:47:48 BRT 2014" modifiedBy="leonardogaona" name="dataMapperSerasaBusiness" revision="1.0" showComponentDetails="false">
 <Global>
-<Metadata __index="0" __referenceCounter="1" __sourcePath="{http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCredito" _dataStructure="OBJECT" _id="__id" _type="Input" id="69baac9a-7950-4564-ab9b-72f3c240902f">
+<Metadata __index="0" __referenceCounter="1" __sourcePath="{http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCredito" _dataStructure="OBJECT" _id="__id" _type="Input" id="76138870-ae01-4976-afd6-d51728efe3cb">
 <Record fieldDelimiter="," name="verificaCredito" recordDelimiter="\n\\|\r\n\\|\r" type="delimited">
 <Field __artificialType="_id" __systemManaged="true" name="__id" type="string"/>
 <Field __index="0" __schemaType="{http://soaexpert.com.br/domain}Empresa" __sourcePath="{http://soaexpert.com.br/domain=ns1,http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCredito/ns0:empresa/ns1:id" containerType="SINGLE" label="id" name="id" type="integer"/>
@@ -10,14 +10,14 @@
 <Field __index="4" __schemaType="{http://soaexpert.com.br/domain}Empresa" __sourcePath="{http://soaexpert.com.br/domain=ns1,http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCredito/ns0:empresa/ns1:telefone" containerType="SINGLE" label="telefone" name="telefone" type="integer"/>
 </Record>
 </Metadata>
-<Metadata __index="0" __referenceCounter="1" __sourcePath="{http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCreditoSPC" _dataStructure="OBJECT" _id="__id" _type="Output" id="1542249f-35e8-488d-9039-ddf659ab2c2f">
-<Record fieldDelimiter="," name="verificaCreditoSPC" recordDelimiter="\n\\|\r\n\\|\r" type="delimited">
+<Metadata __index="0" __referenceCounter="1" __sourcePath="{http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCreditoSerasa" _dataStructure="OBJECT" _id="__id" _type="Output" id="e8f13e86-5e1b-4463-972a-89404c946932">
+<Record fieldDelimiter="," name="verificaCreditoSerasa" recordDelimiter="\n\\|\r\n\\|\r" type="delimited">
 <Field __artificialType="_id" __systemManaged="true" name="__id" type="string"/>
-<Field __index="0" __schemaType="{http://soaexpert.com.br/domain}Empresa" __sourcePath="{http://soaexpert.com.br/domain=ns1,http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCreditoSPC/ns0:empresa/ns1:id" containerType="SINGLE" label="id" name="id" type="integer"/>
-<Field __index="1" __schemaType="{http://soaexpert.com.br/domain}Empresa" __sourcePath="{http://soaexpert.com.br/domain=ns1,http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCreditoSPC/ns0:empresa/ns1:razaoSocial" containerType="SINGLE" label="razaoSocial" name="razaoSocial" type="string"/>
-<Field __index="2" __schemaType="{http://soaexpert.com.br/domain}Empresa" __sourcePath="{http://soaexpert.com.br/domain=ns1,http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCreditoSPC/ns0:empresa/ns1:nomeFantasia" containerType="SINGLE" label="nomeFantasia" name="nomeFantasia" type="string"/>
-<Field __index="3" __schemaType="{http://soaexpert.com.br/domain}Empresa" __sourcePath="{http://soaexpert.com.br/domain=ns1,http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCreditoSPC/ns0:empresa/ns1:cnpj" containerType="SINGLE" label="cnpj" name="cnpj" type="string"/>
-<Field __index="4" __schemaType="{http://soaexpert.com.br/domain}Empresa" __sourcePath="{http://soaexpert.com.br/domain=ns1,http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCreditoSPC/ns0:empresa/ns1:telefone" containerType="SINGLE" label="telefone" name="telefone" type="integer"/>
+<Field __index="0" __schemaType="{http://soaexpert.com.br/domain}Empresa" __sourcePath="{http://soaexpert.com.br/domain=ns1,http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCreditoSerasa/ns0:empresa/ns1:id" containerType="SINGLE" label="id" name="id" type="integer"/>
+<Field __index="1" __schemaType="{http://soaexpert.com.br/domain}Empresa" __sourcePath="{http://soaexpert.com.br/domain=ns1,http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCreditoSerasa/ns0:empresa/ns1:razaoSocial" containerType="SINGLE" label="razaoSocial" name="razaoSocial" type="string"/>
+<Field __index="2" __schemaType="{http://soaexpert.com.br/domain}Empresa" __sourcePath="{http://soaexpert.com.br/domain=ns1,http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCreditoSerasa/ns0:empresa/ns1:nomeFantasia" containerType="SINGLE" label="nomeFantasia" name="nomeFantasia" type="string"/>
+<Field __index="3" __schemaType="{http://soaexpert.com.br/domain}Empresa" __sourcePath="{http://soaexpert.com.br/domain=ns1,http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCreditoSerasa/ns0:empresa/ns1:cnpj" containerType="SINGLE" label="cnpj" name="cnpj" type="string"/>
+<Field __index="4" __schemaType="{http://soaexpert.com.br/domain}Empresa" __sourcePath="{http://soaexpert.com.br/domain=ns1,http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCreditoSerasa/ns0:empresa/ns1:telefone" containerType="SINGLE" label="telefone" name="telefone" type="integer"/>
 </Record>
 </Metadata>
 <Dictionary>
@@ -28,7 +28,7 @@
 <Phase number="0">
 <Node cacheInMemory="true" charset="UTF-8" enabled="enabled" fileURL="dict:outputPayload" guiName="XML WRITER" guiX="900" guiY="20" id="EXT_XML_WRITER0" type="EXT_XML_WRITER">
 <attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
-<clover:element clover:name="ns0:verificaCreditoSPC" xmlns:clover="http://www.cloveretl.com/ns/xmlmapping" xmlns:ns0="http://soaexpert.com.br/CreditoService/" clover:inPort="0">
+<clover:element clover:name="ns0:verificaCreditoSerasa" xmlns:clover="http://www.cloveretl.com/ns/xmlmapping" xmlns:ns0="http://soaexpert.com.br/CreditoService/" clover:inPort="0">
   <clover:element clover:name="ns0:empresa">
     <clover:element clover:name="ns1:id" xmlns:ns1="http://soaexpert.com.br/domain">$0.id</clover:element>
     <clover:element clover:name="ns1:razaoSocial" xmlns:ns1="http://soaexpert.com.br/domain">$0.razaoSocial</clover:element>
@@ -40,7 +40,7 @@
 <attr name="_data_format"><![CDATA[XML]]></attr>
 <attr name="__metadata"><![CDATA[true]]></attr>
 </Node>
-<Node enabled="enabled" guiName="Foreach 'ns0:verificaCredito' -&gt; 'ns0:verificaCreditoSPC'" guiX="460" guiY="20" id="FOREACH_NS0_VERIFICA_CREDITO_NS0_VERIFICA_CREDITO_SPC" transformClass="com.mulesoft.datamapper.transform.MelRecordTransform" type="REFORMAT">
+<Node enabled="enabled" guiName="Foreach 'ns0:verificaCredito' -&gt; 'ns0:verificaCreditoSerasa'" guiX="460" guiY="20" id="FOREACH_NS0_VERIFICA_CREDITO_NS0_VERIFICA_CREDITO_SERASA" transformClass="com.mulesoft.datamapper.transform.MelRecordTransform" type="REFORMAT">
 <attr name="melScript"><![CDATA[//MEL
 //START -> DO NOT REMOVE
 output.__id = input.__id;
@@ -66,7 +66,7 @@ output.telefone = input.telefone;
 <attr name="_data_format"><![CDATA[XML]]></attr>
 <attr name="__rootGlobalElementName"><![CDATA[{http://soaexpert.com.br/CreditoService/}verificaCredito]]></attr>
 </Node>
-<Edge debugMode="true" fromNode="FOREACH_NS0_VERIFICA_CREDITO_NS0_VERIFICA_CREDITO_SPC:0" guiBendpoints="" id="Edge1" inPort="Port 0 (in)" metadata="1542249f-35e8-488d-9039-ddf659ab2c2f" outPort="Port 0 (out)" toNode="EXT_XML_WRITER0:0"/>
-<Edge debugMode="true" fromNode="XML_READER0:0" guiBendpoints="" id="Edge0" inPort="Port 0 (in)" metadata="69baac9a-7950-4564-ab9b-72f3c240902f" outPort="Port 0 (out)" toNode="FOREACH_NS0_VERIFICA_CREDITO_NS0_VERIFICA_CREDITO_SPC:0"/>
+<Edge debugMode="true" fromNode="FOREACH_NS0_VERIFICA_CREDITO_NS0_VERIFICA_CREDITO_SERASA:0" guiBendpoints="" id="Edge1" inPort="Port 0 (in)" metadata="e8f13e86-5e1b-4463-972a-89404c946932" outPort="Port 0 (out)" toNode="EXT_XML_WRITER0:0"/>
+<Edge debugMode="true" fromNode="XML_READER0:0" guiBendpoints="" id="Edge0" inPort="Port 0 (in)" metadata="76138870-ae01-4976-afd6-d51728efe3cb" outPort="Port 0 (out)" toNode="FOREACH_NS0_VERIFICA_CREDITO_NS0_VERIFICA_CREDITO_SERASA:0"/>
 </Phase>
 </Graph>

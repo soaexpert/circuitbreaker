@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph __version="3.5.0" author="leonardogaona" created="Thu Jul 17 15:25:33 BRT 2014" description="mapCasasBahia" guiVersion="3.4.3.P" id="1405624111660" licenseCode="Unlicensed" licenseType="Unknown" modified="Thu Jul 17 15:25:33 BRT 2014" modifiedBy="leonardogaona" name="mapCasasBahia" revision="1.0" showComponentDetails="false">
+<?xml version="1.0" encoding="UTF-8"?><Graph __version="3.5.0" author="leonardogaona" created="Fri Jul 18 16:47:48 BRT 2014" description="DataMapperCasasBahiaBusiness" guiVersion="3.4.3.P" id="1405734866633" licenseCode="Unlicensed" licenseType="Unknown" modified="Fri Jul 18 16:47:48 BRT 2014" modifiedBy="leonardogaona" name="DataMapperCasasBahiaBusiness" revision="1.0" showComponentDetails="false">
 <Global>
-<Metadata __index="0" __referenceCounter="1" __sourcePath="{http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCredito" _dataStructure="OBJECT" _id="__id" _type="Input" id="739e7d2f-9e20-4f82-bf45-99ec7abac81b">
+<Metadata __index="0" __referenceCounter="1" __sourcePath="{http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCredito" _dataStructure="OBJECT" _id="__id" _type="Input" id="256d78d8-a05a-4b9c-87a0-9e696d4201d4">
 <Record fieldDelimiter="," name="verificaCredito" recordDelimiter="\n\\|\r\n\\|\r" type="delimited">
 <Field __artificialType="_id" __systemManaged="true" name="__id" type="string"/>
 <Field __index="0" __schemaType="{http://soaexpert.com.br/domain}Empresa" __sourcePath="{http://soaexpert.com.br/domain=ns1,http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCredito/ns0:empresa/ns1:id" containerType="SINGLE" label="id" name="id" type="integer"/>
@@ -10,7 +10,7 @@
 <Field __index="4" __schemaType="{http://soaexpert.com.br/domain}Empresa" __sourcePath="{http://soaexpert.com.br/domain=ns1,http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCredito/ns0:empresa/ns1:telefone" containerType="SINGLE" label="telefone" name="telefone" type="integer"/>
 </Record>
 </Metadata>
-<Metadata __index="0" __referenceCounter="1" __sourcePath="{http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCreditoCasasBahia" _dataStructure="OBJECT" _id="__id" _type="Output" id="e670e0ea-52bf-4cd4-b5a8-ec8c054393b5">
+<Metadata __index="0" __referenceCounter="1" __sourcePath="{http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCreditoCasasBahia" _dataStructure="OBJECT" _id="__id" _type="Output" id="bde76ec2-227f-4d64-824c-184627884b40">
 <Record fieldDelimiter="," name="verificaCreditoCasasBahia" recordDelimiter="\n\\|\r\n\\|\r" type="delimited">
 <Field __artificialType="_id" __systemManaged="true" name="__id" type="string"/>
 <Field __index="0" __schemaType="{http://soaexpert.com.br/domain}Empresa" __sourcePath="{http://soaexpert.com.br/domain=ns1,http://soaexpert.com.br/CreditoService/=ns0}/ns0:verificaCreditoCasasBahia/ns0:empresa/ns1:id" containerType="SINGLE" label="id" name="id" type="integer"/>
@@ -66,7 +66,7 @@ output.telefone = input.telefone;
 <attr name="_data_format"><![CDATA[XML]]></attr>
 <attr name="__rootGlobalElementName"><![CDATA[{http://soaexpert.com.br/CreditoService/}verificaCredito]]></attr>
 </Node>
-<Edge debugMode="true" fromNode="FOREACH_NS0_VERIFICA_CREDITO_NS0_VERIFICA_CREDITO_CASAS_BAHIA:0" guiBendpoints="" id="Edge1" inPort="Port 0 (in)" metadata="e670e0ea-52bf-4cd4-b5a8-ec8c054393b5" outPort="Port 0 (out)" toNode="EXT_XML_WRITER0:0"/>
-<Edge debugMode="true" fromNode="XML_READER0:0" guiBendpoints="" id="Edge0" inPort="Port 0 (in)" metadata="739e7d2f-9e20-4f82-bf45-99ec7abac81b" outPort="Port 0 (out)" toNode="FOREACH_NS0_VERIFICA_CREDITO_NS0_VERIFICA_CREDITO_CASAS_BAHIA:0"/>
+<Edge debugMode="true" fromNode="FOREACH_NS0_VERIFICA_CREDITO_NS0_VERIFICA_CREDITO_CASAS_BAHIA:0" guiBendpoints="" id="Edge1" inPort="Port 0 (in)" metadata="bde76ec2-227f-4d64-824c-184627884b40" outPort="Port 0 (out)" toNode="EXT_XML_WRITER0:0"/>
+<Edge debugMode="true" fromNode="XML_READER0:0" guiBendpoints="" id="Edge0" inPort="Port 0 (in)" metadata="256d78d8-a05a-4b9c-87a0-9e696d4201d4" outPort="Port 0 (out)" toNode="FOREACH_NS0_VERIFICA_CREDITO_NS0_VERIFICA_CREDITO_CASAS_BAHIA:0"/>
 </Phase>
 </Graph>

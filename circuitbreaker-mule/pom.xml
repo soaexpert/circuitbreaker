@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>br.com.soaexpert</groupId>
@@ -17,12 +20,10 @@
 		<jdk.version>1.6</jdk.version>
 		<junit.version>4.9</junit.version>
 	</properties>
-
 	<build>
-		<!-- Use a newer version of the install plugin than what your Maven uses 
-			by default. The older version failed to install the project if there was 
-			no target/classes folder. Since we use mule packaging on the project we actually 
-			create and attach the zip that must be installed. -->
+		<!-- Use a newer version of the install plugin than what your Maven uses by default. The older version failed to install 
+			the project if there was no target/classes folder. Since we use mule packaging on the project we actually create and attach 
+			the zip that must be installed. -->
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -30,8 +31,7 @@
 					<artifactId>maven-install-plugin</artifactId>
 					<version>2.3.1</version>
 				</plugin>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -50,7 +50,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore/>
+										<ignore />
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -67,6 +67,12 @@
 				<extensions>true</extensions>
 				<configuration>
 					<copyToAppsDirectory>true</copyToAppsDirectory>
+					<inclusions>
+						<inclusion>
+							<groupId>com.mulesoft.security</groupId>
+							<artifactId>mule-module-security-oauth2-provider</artifactId>
+						</inclusion>
+					</inclusions>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -115,32 +121,32 @@
 						<resource>
 							<directory>src/main/app/</directory>
 						</resource>
-					<resource>
-                            <directory>src/main/api/</directory>
-                        </resource>
-                    </resources>
+						<resource>
+							<directory>src/main/api/</directory>
+						</resource>
+					</resources>
 				</configuration>
 			</plugin>
 			<plugin>
-		        <groupId>org.codehaus.mojo</groupId>
-		        <artifactId>exec-maven-plugin</artifactId>
-		        <version>1.2.1</version>
-		        <executions>
-		          <execution>
-		            <goals>
-		              <goal>java</goal>
-		            </goals>
-		          </execution>
-		        </executions>
-		        <configuration>
-		          <mainClass>org.mule.MuleServer</mainClass>
-		          <arguments>
-		            <argument>-config</argument>
-					<argument>src/main/app/mule-config.xml</argument>
-		          </arguments>
-		        <classpathScope>compile</classpathScope>
-		        </configuration>
-		      </plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.2.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>java</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<mainClass>org.mule.MuleServer</mainClass>
+					<arguments>
+						<argument>-config</argument>
+						<argument>src/main/app/mule-config.xml</argument>
+					</arguments>
+					<classpathScope>compile</classpathScope>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -266,7 +272,11 @@
 			<version>${mule.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.mule.transports</groupId>
+			<artifactId>mule-transport-amqp</artifactId>
+			<version>3.4.2</version>
+		</dependency>
 		<!-- Mule Modules -->
 		<dependency>
 			<groupId>org.mule.modules</groupId>
@@ -326,35 +336,35 @@
 	</dependencies>
 
 	<repositories>
-          <repository>
-            <id>Central</id>
-            <name>Central</name>
-            <url>http://repo1.maven.org/maven2/</url>
-            <layout>default</layout>
-        </repository>
-        <repository>
-            <id>mulesoft-releases</id>
-            <name>MuleSoft Releases Repository</name>
-            <url>http://repository.mulesoft.org/releases/</url>
-            <layout>default</layout>
-        </repository>
-        <repository>
-            <id>mulesoft-snapshots</id>
-            <name>MuleSoft Snapshots Repository</name>
-            <url>http://repository.mulesoft.org/snapshots/</url>
-            <layout>default</layout>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>mulesoft-release</id>
-            <name>mulesoft release repository</name>
-            <layout>default</layout>
-            <url>http://repository.mulesoft.org/releases/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
+		<repository>
+			<id>Central</id>
+			<name>Central</name>
+			<url>http://repo1.maven.org/maven2/</url>
+			<layout>default</layout>
+		</repository>
+		<repository>
+			<id>mulesoft-releases</id>
+			<name>MuleSoft Releases Repository</name>
+			<url>http://repository.mulesoft.org/releases/</url>
+			<layout>default</layout>
+		</repository>
+		<repository>
+			<id>mulesoft-snapshots</id>
+			<name>MuleSoft Snapshots Repository</name>
+			<url>http://repository.mulesoft.org/snapshots/</url>
+			<layout>default</layout>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>mulesoft-release</id>
+			<name>mulesoft release repository</name>
+			<layout>default</layout>
+			<url>http://repository.mulesoft.org/releases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 
 </project>

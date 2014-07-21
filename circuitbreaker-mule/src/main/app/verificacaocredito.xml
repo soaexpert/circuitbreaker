@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule
+	xmlns:amqp="http://www.mulesoft.org/schema/mule/amqp"
 	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
 	xmlns:email="http://www.mulesoft.org/schema/mule/email"
 	xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper"
@@ -20,7 +21,8 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/data-mapper http://www.mulesoft.org/schema/mule/ee/data-mapper/current/mule-data-mapper.xsd
 http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
-http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/amqp http://www.mulesoft.org/schema/mule/amqp/current/mule-amqp.xsd">
 
 	<mulexml:namespace-manager includeConfigNamespaces="false">
 		<mulexml:namespace
@@ -41,19 +43,6 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 		name="JAXB_Context"
 		packageNames="br.com.soaexpert.creditoservice"
 		doc:name="JAXB Context" />
-	<data-mapper:config
-		name="MapSPC"
-		transformationGraphPath="mapspc.grf"
-		doc:name="MapSPC" />
-	<data-mapper:config
-		name="MapSerasa"
-		transformationGraphPath="mapserasa.grf"
-		doc:name="MapSerasa" />
-	<data-mapper:config
-		name="mapCasasBahia"
-		transformationGraphPath="mapcasasbahia.grf"
-		doc:name="mapCasasBahia" />
-    <catch-exception-strategy name="Catch_Exception_Strategy"/>
 
 	<flow
 		name="verificacaocredito"
@@ -76,20 +65,16 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 			doc:name="XML to DOM"
 			outputEncoding="UTF-8" />
 		<mulexml:dom-to-xml-transformer doc:name="DOM to XML" />
-		<logger
-			message="#[payload]"
-			level="INFO"
-			doc:name="Logger" />
 		<scatter-gather doc:name="Scatter-Gather">
 			<custom-aggregation-strategy class="br.com.soaexpert.credito.components.aggregator.VerificacaoCreditoAggregationStrategy" />
 			<flow-ref
 				name="SPC"
 				doc:name="toSPC" />
 			<flow-ref
-				name="Serasa"
+				name="serasa"
 				doc:name="toSerasa" />
 			<flow-ref
-				name="CasasBahia"
+				name="casasBahia"
 				doc:name="toCasasBahia" />
 		</scatter-gather>
 		<mulexml:jaxb-object-to-xml-transformer
@@ -108,49 +93,4 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 		</catch-exception-strategy>
 
 	</flow>
-	<sub-flow
-		name="SPC"
-		doc:name="SPC">
-		<data-mapper:transform
-			config-ref="MapSPC"
-			doc:name="MapSPC" />
-		<ws:consumer
-			config-ref="CreditoServiceImpl"
-			operation="verificaCreditoSPC"
-			doc:name="SPC" />
-		<mulexml:dom-to-xml-transformer doc:name="DOM to XML" />
-		<mulexml:jaxb-xml-to-object-transformer
-			jaxbContext-ref="JAXB_Context"
-			doc:name="XML to JAXB Object" />
-	</sub-flow>
-	<sub-flow
-		name="Serasa"
-		doc:name="Serasa">
-		<data-mapper:transform
-			config-ref="MapSerasa"
-			doc:name="MapSerasa" />
-		<ws:consumer
-			config-ref="CreditoServiceImpl"
-			operation="verificaCreditoSerasa"
-			doc:name="Serasa" />
-		<mulexml:dom-to-xml-transformer doc:name="DOM to XML" />
-		<mulexml:jaxb-xml-to-object-transformer
-			jaxbContext-ref="JAXB_Context"
-			doc:name="XML to JAXB Object" />
-	</sub-flow>
-	<sub-flow
-		name="CasasBahia"
-		doc:name="CasasBahia">
-		<data-mapper:transform
-			config-ref="mapCasasBahia"
-			doc:name="mapCasasBahia" />
-		<ws:consumer
-			config-ref="CreditoServiceImpl"
-			operation="verificaCreditoCasasBahia"
-			doc:name="Casas Bahia" />
-		<mulexml:dom-to-xml-transformer doc:name="DOM to XML" />
-		<mulexml:jaxb-xml-to-object-transformer
-			jaxbContext-ref="JAXB_Context"
-			doc:name="XML to JAXB Object" />
-	</sub-flow>
 </mule>

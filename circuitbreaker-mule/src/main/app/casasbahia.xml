@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:amqp="http://www.mulesoft.org/schema/mule/amqp" xmlns:ws="http://www.mulesoft.org/schema/mule/ws" xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+http://www.mulesoft.org/schema/mule/ee/data-mapper http://www.mulesoft.org/schema/mule/ee/data-mapper/current/mule-data-mapper.xsd
+http://www.mulesoft.org/schema/mule/amqp http://www.mulesoft.org/schema/mule/amqp/current/mule-amqp.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+    <data-mapper:config name="dataMapperCasasBahiaBusiness" transformationGraphPath="datamappercasasbahiabusiness.grf" doc:name="DataMapperCasasBahiaBusiness"/>
+    <flow name="casasBahia" doc:name="casasBahia">
+        <data-mapper:transform config-ref="dataMapperCasasBahiaBusiness" doc:name="DataMapperCasasBahiaBusiness"/>
+        <ws:consumer config-ref="CreditoServiceImpl" operation="verificaCreditoCasasBahia" doc:name="Casas Bahia"/>
+        <set-variable variableName="payloadCopy" value="#[payload]" doc:name="Variable"/>
+        <expression-component doc:name="Expression"><![CDATA[#[payload = 
+	"<circuitData>"
++ "<circuitName>testeCasasBahia</circuitName> "
++ " <requestSuccessful>true</requestSuccessful> "
++ " <disableCircuitURL>log:teste</disableCircuitURL> "
++ " <enableCircuitURL>log:teste</enableCircuitURL> "
++ "</circuitData>"]]]></expression-component>
+        <vm:outbound-endpoint exchange-pattern="one-way" path="circuitQueue" connector-ref="VM" doc:name="VM"/>
+        <set-payload value="#[flowVars.payloadCopy]" doc:name="Set Payload"/>
+        <flow-ref name="outputcreditoFlow" doc:name="Flow Reference"/>
+        <catch-exception-strategy doc:name="Catch Exception Strategy">
+            <expression-component doc:name="Expression"><![CDATA[#[payload = 
+	"<circuitData>"
++ "<circuitName>testeCasasBahia</circuitName> "
++ " <requestSuccessful>" + xpath:count('//cred:verificaCreditoCasasBahiaFault') > 0 + "</requestSuccessful> "
++ " <disableCircuitURL>log:teste</disableCircuitURL> "
++ " <enableCircuitURL>log:teste</enableCircuitURL> "
++ "</circuitData>"]]]></expression-component>
+            <vm:outbound-endpoint exchange-pattern="one-way" path="circuitQueue" connector-ref="VM" doc:name="VM"/>
+        </catch-exception-strategy>
+    </flow>
+</mule>
