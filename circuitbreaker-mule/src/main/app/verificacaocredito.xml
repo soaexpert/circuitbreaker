@@ -6,12 +6,13 @@
 	xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper"
 	xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
 	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+	xmlns:management="http://www.mulesoft.org/schema/mule/management"
 	xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
 	xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans"
-	version="EE-3.5.0"
+	version="EE-3.5.1"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd
 http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
@@ -21,6 +22,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/data-mapper http://www.mulesoft.org/schema/mule/ee/data-mapper/current/mule-data-mapper.xsd
 http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/management http://www.mulesoft.org/schema/mule/management/current/mule-management.xsd
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
 http://www.mulesoft.org/schema/mule/amqp http://www.mulesoft.org/schema/mule/amqp/current/mule-amqp.xsd">
 
@@ -53,18 +55,55 @@ http://www.mulesoft.org/schema/mule/amqp http://www.mulesoft.org/schema/mule/amq
 			port="${http.port}"
 			path="${http.path}"
 			doc:name="HTTP"
-			responseTimeout="10000000" />
+			responseTimeout="5000" />
 		<cxf:proxy-service
 			port="CreditoServiceSOAP"
 			namespace="http://soaexpert.com.br/CreditoService/"
 			service="CreditoService"
 			payload="body"
 			wsdlLocation="contracts/CreditoServiceProxy.wsdl"
-			doc:name="CXF" />
+			doc:name="Proxy Service" />
 		<mulexml:xml-to-dom-transformer
-			doc:name="XML to DOM"
-			outputEncoding="UTF-8" />
-		<mulexml:dom-to-xml-transformer doc:name="DOM to XML" />
+			outputEncoding="UTF-8"
+			doc:name="to DOM" />
+		<set-variable
+			variableName="body"
+			value="#[payload]"
+			doc:name="Copia payload" />
+		<flow-ref
+			name="circuitCheckFlow"
+			doc:name="checa circuito" />
+		<choice doc:name="Choice">
+			<when expression="#[payload == false]">
+				<flow-ref
+					name="rejeitaFlow"
+					doc:name="rejeita" />
+			</when>
+			<otherwise>
+				<flow-ref
+					name="processaFlow"
+					doc:name="processa" />
+			</otherwise>
+		</choice>
+		<catch-exception-strategy doc:name="Catch Exception Strategy">
+			<message-properties-transformer doc:name="Message Properties">
+				<add-message-property
+					key="http.status"
+					value="500" />
+			</message-properties-transformer>
+			<expression-component doc:name="Expression"><![CDATA[#[payload = '<Fault xmlns="http://schemas.xmlsoap.org/soap/envelope/">' 
++ '<faultcode>S:Server</faultcode>'
++ '<faultstring>Erro durante o processamento</faultstring>'
++ '</Fault>']]]></expression-component>
+		</catch-exception-strategy>
+
+	</flow>
+	<sub-flow
+		name="processaFlow"
+		doc:name="processaFlow">
+		<set-payload
+			value="#[flowVars.body]"
+			doc:name="Set Payload" />
 		<scatter-gather doc:name="Scatter-Gather">
 			<custom-aggregation-strategy class="br.com.soaexpert.credito.components.aggregator.VerificacaoCreditoAggregationStrategy" />
 			<flow-ref
@@ -79,18 +118,22 @@ http://www.mulesoft.org/schema/mule/amqp http://www.mulesoft.org/schema/mule/amq
 		</scatter-gather>
 		<mulexml:jaxb-object-to-xml-transformer
 			jaxbContext-ref="JAXB_Context"
-			doc:name="JAXB Object to XML" />
+			doc:name="to XML" />
 		<mulexml:xml-to-dom-transformer
 			outputEncoding="UTF-8"
-			doc:name="XML to DOM" />
-		<catch-exception-strategy doc:name="Catch Exception Strategy">
-			<message-properties-transformer doc:name="Message Properties">
-				<add-message-property
-					key="http.status"
-					value="500" />
-			</message-properties-transformer>
-			<expression-component doc:name="Expression"><![CDATA[#[payload = '<Fault xmlns="http://schemas.xmlsoap.org/soap/envelope/"><faultcode>S:Server</faultcode><faultstring>Error processing the request. Try again one day...</faultstring></Fault>']]]></expression-component>
-		</catch-exception-strategy>
-
-	</flow>
+			doc:name="to DOM" />
+	</sub-flow>
+	<sub-flow
+		name="rejeitaFlow"
+		doc:name="rejeitaFlow">
+		<message-properties-transformer doc:name="Seta HTTP 500">
+			<add-message-property
+				key="http.status"
+				value="500" />
+		</message-properties-transformer>
+		<expression-component doc:name="Expression"><![CDATA[#[payload = '<Fault xmlns="http://schemas.xmlsoap.org/soap/envelope/">' 
++ '<faultcode>S:Server</faultcode>'
++ '<faultstring>Servico indisponivel no momento.</faultstring>'
++ '</Fault>']]]></expression-component>
+	</sub-flow>
 </mule>

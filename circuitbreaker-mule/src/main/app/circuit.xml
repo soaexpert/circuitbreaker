@@ -18,10 +18,61 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
-	
-    <flow name="circuitFlow2" doc:name="circuitFlow2">
-        <vm:inbound-endpoint exchange-pattern="one-way" path="circuitQueue" connector-ref="VM" doc:name="VM"/>
-        <logger message="#[message.payloadAs(java.lang.String)]" level="INFO" doc:name="Logger"/>
-    </flow>
+	<amqp:connector
+		name="amqp_connecor"
+		validateConnections="true"
+		host="192.168.1.33"
+		doc:name="AMQP Connector" />
+	<flow
+		name="circuitCheckFlow"
+		doc:name="circuitCheckFlow">
+		<set-variable
+			variableName="http.disable.status.code.exception.check"
+			value="true"
+			doc:name="desabilita checagem de código http" />
+		<scatter-gather doc:name="Scatter-Gather">
+			<custom-aggregation-strategy class="br.com.soaexpert.credito.components.aggregator.CircuitCheckAggregationStrategy" />
+			<http:outbound-endpoint
+				exchange-pattern="request-response"
+				host="${circuit.host}"
+				port="${circuit.port}"
+				path="${circuit.path}/serasa"
+				method="GET"
+				doc:name="check serasa" />
+			<http:outbound-endpoint
+				exchange-pattern="request-response"
+				host="${circuit.host}"
+				port="${circuit.port}"
+				path="${circuit.path}/spc"
+				method="GET"
+				doc:name="check SPC" />
+			<http:outbound-endpoint
+				exchange-pattern="request-response"
+				host="${circuit.host}"
+				port="${circuit.port}"
+				path="${circuit.path}/casasBahia"
+				method="GET"
+				doc:name="check Casas Bahia" />
+		</scatter-gather>
+	</flow>
+
+	<flow
+		name="circuitFeedFlow"
+		doc:name="circuitFeedFlow">
+		<vm:inbound-endpoint
+			exchange-pattern="one-way"
+			path="circuitQueue"
+			connector-ref="VM"
+			doc:name="VM" />
+		<object-to-byte-array-transformer doc:name="Object to Byte Array" />
+		<amqp:outbound-endpoint
+			exchangeName="teste"
+			exchangeType="direct"
+			exchangeDurable="true"
+			responseTimeout="10000"
+			exchange-pattern="request-response"
+			doc:name="AMQP"
+			exchangeAutoDelete="true" />
+	</flow>
 
 </mule>

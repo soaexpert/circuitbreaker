@@ -33,7 +33,7 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
         <set-variable variableName="payloadCopy" value="#[payload]" doc:name="Variable"/>
         <expression-component doc:name="Expression"><![CDATA[#[payload = 
 	"<circuitData>"
-+ "<circuitName>testeSPC</circuitName> "
++ "<circuitName>spc</circuitName> "
 + " <requestSuccessful>true</requestSuccessful> "
 + " <disableCircuitURL>log:teste</disableCircuitURL> "
 + " <enableCircuitURL>log:teste</enableCircuitURL> "
@@ -44,8 +44,8 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
 		<catch-exception-strategy doc:name="Catch Exception Strategy" >
             <expression-component doc:name="Expression"><![CDATA[#[payload = 
 	"<circuitData>"
-+ "<circuitName>testeCasasBahia</circuitName> "
-+ " <requestSuccessful>" + xpath:count('//cred:verificaCreditoSPCFault') > 0 + "</requestSuccessful> "
++ "<circuitName>spc</circuitName> "
++ " <requestSuccessful>false</requestSuccessful> "
 + " <disableCircuitURL>log:teste</disableCircuitURL> "
 + " <enableCircuitURL>log:teste</enableCircuitURL> "
 + "</circuitData>"]]]></expression-component>
