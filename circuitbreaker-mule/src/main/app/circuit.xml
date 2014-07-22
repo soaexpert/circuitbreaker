@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:amqp="http://www.mulesoft.org/schema/mule/amqp"
+	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	version="EE-3.5.1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/amqp http://www.mulesoft.org/schema/mule/amqp/current/mule-amqp.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
+	<amqp:connector
+		name="amqp_connecor"
+		validateConnections="true"
+		host="192.168.1.33"
+		doc:name="AMQP Connector" />
+	<flow
+		name="circuitCheckFlow"
+		doc:name="circuitCheckFlow">
+		<set-variable
+			variableName="http.disable.status.code.exception.check"
+			value="true"
+			doc:name="desabilita checagem de código http" />
+		<scatter-gather doc:name="verifica Circuitos">
+			<custom-aggregation-strategy class="br.com.soaexpert.credito.components.aggregator.CircuitCheckAggregationStrategy" />
+			<http:outbound-endpoint
+				exchange-pattern="request-response"
+				host="${circuit.host}"
+				port="${circuit.port}"
+				path="${circuit.path}/serasa"
+				method="GET"
+				doc:name="Serasa" />
+			<http:outbound-endpoint
+				exchange-pattern="request-response"
+				host="${circuit.host}"
+				port="${circuit.port}"
+				path="${circuit.path}/spc"
+				method="GET"
+				doc:name="SPC" />
+			<http:outbound-endpoint
+				exchange-pattern="request-response"
+				host="${circuit.host}"
+				port="${circuit.port}"
+				path="${circuit.path}/casasBahia"
+				method="GET"
+				doc:name="CasasBahia" />
+		</scatter-gather>
+	</flow>
+
+	<flow
+		name="circuitFeedFlow"
+		doc:name="circuitFeedFlow">
+		<vm:inbound-endpoint
+			exchange-pattern="one-way"
+			path="circuitQueue"
+			connector-ref="VM"
+			doc:name="VM" />
+		<object-to-byte-array-transformer doc:name="to byte[]" />
+		<amqp:outbound-endpoint
+			exchangeName="teste"
+			exchangeType="direct"
+			exchangeDurable="true"
+			responseTimeout="10000"
+			exchange-pattern="request-response"
+			doc:name="to RabbitMQ"
+			exchangeAutoDelete="true" />
+	</flow>
+
+</mule>

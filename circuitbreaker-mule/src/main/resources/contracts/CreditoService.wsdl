@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:sxpt="http://soaexpert.com.br/CreditoService/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	name="CreditoService"
+	targetNamespace="http://soaexpert.com.br/CreditoService/">
+	<wsdl:types>
+		<xsd:schema>
+			<xsd:import
+				namespace="http://soaexpert.com.br/CreditoService/"
+				schemaLocation="CreditoService.xsd" />
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="verificaCreditoSerasaRequest">
+		<wsdl:part
+			element="sxpt:verificaCreditoSerasa"
+			name="parameters" />
+	</wsdl:message>
+	<wsdl:message name="verificaCreditoSerasaResponse">
+		<wsdl:part
+			element="sxpt:verificaCreditoSerasaResponse"
+			name="parameters" />
+	</wsdl:message>
+	<wsdl:message name="verificaCreditoSerasaFault">
+		<wsdl:part
+			name="parameters"
+			element="sxpt:verificaCreditoSerasaFault"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="verificaCreditoSPCRequest">
+		<wsdl:part
+			name="parameters"
+			element="sxpt:verificaCreditoSPC"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="verificaCreditoSPCResponse">
+		<wsdl:part
+			name="parameters"
+			element="sxpt:verificaCreditoSPCResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="verificaCreditoSPCFault">
+		<wsdl:part
+			name="parameters"
+			element="sxpt:verificaCreditoSPCFault"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="verificaCreditoCasasBahiaRequest">
+		<wsdl:part
+			name="parameters"
+			element="sxpt:verificaCreditoCasasBahia"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="verificaCreditoCasasBahiaResponse">
+		<wsdl:part
+			name="parameters"
+			element="sxpt:verificaCreditoCasasBahiaResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="verificaCreditoCasasBahiaFault">
+		<wsdl:part
+			name="parameters"
+			element="sxpt:verificaCreditoCasasBahiaFault"></wsdl:part>
+	</wsdl:message>
+	<wsdl:portType name="CreditoService">
+		<wsdl:operation name="verificaCreditoSerasa">
+			<wsdl:input message="sxpt:verificaCreditoSerasaRequest" />
+			<wsdl:output message="sxpt:verificaCreditoSerasaResponse" />
+			<wsdl:fault
+				name="fault"
+				message="sxpt:verificaCreditoSerasaFault">
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="verificaCreditoSPC">
+			<wsdl:input message="sxpt:verificaCreditoSPCRequest"></wsdl:input>
+			<wsdl:output message="sxpt:verificaCreditoSPCResponse"></wsdl:output>
+			<wsdl:fault
+				name="fault"
+				message="sxpt:verificaCreditoSPCFault"></wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="verificaCreditoCasasBahia">
+			<wsdl:input message="sxpt:verificaCreditoCasasBahiaRequest"></wsdl:input>
+			<wsdl:output message="sxpt:verificaCreditoCasasBahiaResponse"></wsdl:output>
+			<wsdl:fault
+				name="fault"
+				message="sxpt:verificaCreditoCasasBahiaFault"></wsdl:fault>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding
+		name="CreditoServiceSOAP"
+		type="sxpt:CreditoService">
+		<soap:binding
+			style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="verificaCreditoSerasa">
+			<soap:operation soapAction="http://www.soaexpert.com.br/CreditoService/verificaCreditoSerasa" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault
+					name="fault"
+					use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="verificaCreditoSPC">
+			<soap:operation soapAction="http://www.soaexpert.com.br/CreditoService/verificaCreditoSPC" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault
+					name="fault"
+					use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="verificaCreditoCasasBahia">
+			<soap:operation soapAction="http://www.soaexpert.com.br/CreditoService/verificaCreditoCasasBahia" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault
+					name="fault"
+					use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="CreditoService">
+		<wsdl:port
+			binding="sxpt:CreditoServiceSOAP"
+			name="CreditoServiceSOAP">
+			<soap:address location="http://www.example.org/" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>
