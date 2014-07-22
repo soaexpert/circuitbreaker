@@ -45,11 +45,9 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
 + " <disableCircuitURL>log:teste</disableCircuitURL> "
 + " <enableCircuitURL>log:teste</enableCircuitURL> "
 + "</circuitData>"]]]></expression-component>
-		<vm:outbound-endpoint
-			exchange-pattern="one-way"
-			path="circuitQueue"
-			connector-ref="VM"
-			doc:name="to circuitQueue" />
+        <async doc:name="Async">
+            <vm:outbound-endpoint exchange-pattern="one-way" path="circuitQueue" connector-ref="VM" doc:name="to circuitQueue"/>
+        </async>
 		<set-payload
 			value="#[flowVars.payloadCopy]"
 			doc:name="Set Payload" />
@@ -64,11 +62,9 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
 + " <disableCircuitURL>log:teste</disableCircuitURL> "
 + " <enableCircuitURL>log:teste</enableCircuitURL> "
 + "</circuitData>"]]]></expression-component>
-			<vm:outbound-endpoint
-				exchange-pattern="one-way"
-				path="circuitQueue"
-				connector-ref="VM"
-				doc:name="VM" />
+            <async doc:name="Async">
+                <vm:outbound-endpoint exchange-pattern="one-way" path="circuitQueue" connector-ref="VM" doc:name="to circuitQueue"/>
+            </async>
 		</catch-exception-strategy>
 	</flow>
 </mule>

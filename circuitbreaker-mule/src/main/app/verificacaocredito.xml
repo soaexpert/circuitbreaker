@@ -69,7 +69,7 @@ http://www.mulesoft.org/schema/mule/amqp http://www.mulesoft.org/schema/mule/amq
 		<set-variable
 			variableName="body"
 			value="#[payload]"
-			doc:name="Copia payload" />
+			doc:name="copia payload" />
 		<flow-ref
 			name="circuitCheckFlow"
 			doc:name="checa circuito" />
@@ -86,7 +86,7 @@ http://www.mulesoft.org/schema/mule/amqp http://www.mulesoft.org/schema/mule/amq
 			</otherwise>
 		</choice>
 		<catch-exception-strategy doc:name="Catch Exception Strategy">
-			<message-properties-transformer doc:name="Message Properties">
+			<message-properties-transformer doc:name="seta HTTP 500">
 				<add-message-property
 					key="http.status"
 					value="500" />
@@ -126,7 +126,7 @@ http://www.mulesoft.org/schema/mule/amqp http://www.mulesoft.org/schema/mule/amq
 	<sub-flow
 		name="rejeitaFlow"
 		doc:name="rejeitaFlow">
-		<message-properties-transformer doc:name="Seta HTTP 500">
+		<message-properties-transformer doc:name="seta HTTP 500">
 			<add-message-property
 				key="http.status"
 				value="500" />

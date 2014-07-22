@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:amqp="http://www.mulesoft.org/schema/mule/amqp"
+<mule
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:amqp="http://www.mulesoft.org/schema/mule/amqp"
 	xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper"
 	xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
 	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
@@ -20,36 +22,55 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 http://www.mulesoft.org/schema/mule/ee/data-mapper http://www.mulesoft.org/schema/mule/ee/data-mapper/current/mule-data-mapper.xsd
 http://www.mulesoft.org/schema/mule/amqp http://www.mulesoft.org/schema/mule/amqp/current/mule-amqp.xsd
 http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
-    <data-mapper:config name="dataMapperSPCBusiness" transformationGraphPath="datamapperspcbusiness.grf" doc:name="dataMapperSPCBusiness"/>
-    <vm:connector name="VM" validateConnections="true" doc:name="VM"/>
+	<data-mapper:config
+		name="dataMapperSPCBusiness"
+		transformationGraphPath="datamapperspcbusiness.grf"
+		doc:name="dataMapperSPCBusiness" />
+	<vm:connector
+		name="VM"
+		validateConnections="true"
+		doc:name="VM" />
 	<flow
 		name="SPC"
 		doc:name="SPC">
-        <data-mapper:transform config-ref="dataMapperSPCBusiness" doc:name="dataMapperSPCBusiness"/>
+		<data-mapper:transform
+			config-ref="dataMapperSPCBusiness"
+			doc:name="dataMapperSPCBusiness" />
 		<ws:consumer
 			config-ref="CreditoServiceImpl"
 			operation="verificaCreditoSPC"
-			doc:name="SPC" />
-        <set-variable variableName="payloadCopy" value="#[payload]" doc:name="Variable"/>
-        <expression-component doc:name="Expression"><![CDATA[#[payload = 
+			doc:name="spcWS" />
+		<set-variable
+			variableName="payloadCopy"
+			value="#[payload]"
+			doc:name="Variable" />
+		<expression-component doc:name="Expression"><![CDATA[#[payload = 
 	"<circuitData>"
 + "<circuitName>spc</circuitName> "
 + " <requestSuccessful>true</requestSuccessful> "
 + " <disableCircuitURL>log:teste</disableCircuitURL> "
 + " <enableCircuitURL>log:teste</enableCircuitURL> "
 + "</circuitData>"]]]></expression-component>
-        <vm:outbound-endpoint exchange-pattern="one-way" path="circuitQueue" connector-ref="VM" doc:name="VM"/>
-        <set-payload value="#[flowVars.payloadCopy]" doc:name="Set Payload"/>
-        <flow-ref name="outputcreditoFlow" doc:name="Flow Reference"/>
-		<catch-exception-strategy doc:name="Catch Exception Strategy" >
-            <expression-component doc:name="Expression"><![CDATA[#[payload = 
+        <async doc:name="Async">
+            <vm:outbound-endpoint exchange-pattern="one-way" path="circuitQueue" connector-ref="VM" doc:name="to circuitQueue"/>
+        </async>
+		<set-payload
+			value="#[flowVars.payloadCopy]"
+			doc:name="copia payload" />
+		<flow-ref
+			name="outputcreditoFlow"
+			doc:name="Flow Reference" />
+		<catch-exception-strategy doc:name="Catch Exception Strategy">
+			<expression-component doc:name="Expression"><![CDATA[#[payload = 
 	"<circuitData>"
 + "<circuitName>spc</circuitName> "
 + " <requestSuccessful>false</requestSuccessful> "
 + " <disableCircuitURL>log:teste</disableCircuitURL> "
 + " <enableCircuitURL>log:teste</enableCircuitURL> "
 + "</circuitData>"]]]></expression-component>
-            <vm:outbound-endpoint exchange-pattern="one-way" path="circuitQueue" connector-ref="VM" doc:name="VM"/>
-        </catch-exception-strategy>
+            <async doc:name="Async">
+                <vm:outbound-endpoint exchange-pattern="one-way" path="circuitQueue" connector-ref="VM" doc:name="to circuitQueue"/>
+            </async>
+		</catch-exception-strategy>
 	</flow>
 </mule>
