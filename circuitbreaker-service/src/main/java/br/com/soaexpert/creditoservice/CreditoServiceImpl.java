@@ -25,7 +25,7 @@ import br.com.soaexpert.domain.Empresa;
 public class CreditoServiceImpl implements CreditoService {
 
 	public static void main(String[] args) {
-		Endpoint.publish("http://localhost:8099/CreditoService", new CreditoServiceImpl());
+		Endpoint.publish("http://0.0.0.0:8099/CreditoService", new CreditoServiceImpl());
 		System.out.println("Service published on port 8099");
 	}
 
