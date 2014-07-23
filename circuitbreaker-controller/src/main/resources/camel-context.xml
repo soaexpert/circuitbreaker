@@ -10,10 +10,15 @@
 	<beans:bean id="gson"
 		class="org.apache.camel.component.gson.GsonDataFormat" />
 
+	
+	
 
 	<camelContext id="camel">
-
-
+		
+		<dataFormats>
+			<jaxb id="jaxb" contextPath="br.com.soaexpert.circuitbreaker.services"/>
+		</dataFormats>
+	
 		<route>
 			<from uri="cxfrs://bean://restServices" />
 			<process ref="router" />
@@ -67,6 +72,7 @@
 		<route>
 			<from
 				uri="rabbitmq://localhost:5672/teste?username=guest&amp;password=guest" />
+			<unmarshal ref="jaxb" />
 			<to uri="seda:circuitDataFeed" />
 		</route>
 
