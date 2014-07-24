@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns="http://camel.apache.org/schema/spring" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	 http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring-2.13.1.xsd
+	">
+
+
+
+
+	<camelContext id="camel">
+	
+		<endpoint id="verificaCreditoService" uri="cxf://http://localhost:8099/CreditoService?wsdlURL=contracts/CreditoService.wsdl&amp;serviceClass=br.com.soaexpert.creditoservice.CreditoService"/>
+
+		<dataFormats>
+			<jaxb id="jaxb"
+				contextPath="br.com.soaexpert.circuitbreaker.services:br.com.soaexpert.creditoservice:br.com.soaexpert.domain" />
+		</dataFormats>
+
+
+		<route>
+			<from uri="cxf:bean:proxyEndpoint" />
+			<to uri="direct:checaCircuitos" />
+			<doTry>
+				<multicast strategyRef="agregadorResultadosServicos" parallelProcessing="true"> 
+					<to uri="direct:consultaSerasa" />
+					<to uri="direct:consultaSPC" />
+					<to uri="direct:consultaCasasBahia" />
+				</multicast>
+				<to uri="vm:notificarSucessoCircuito" pattern="InOnly" />
+				<doCatch>
+					<exception>br.com.soaexpert.creditoservice.VerificaCreditoCasasBahiaFault_Exception</exception>
+					<exception>br.com.soaexpert.creditoservice.VerificaCreditoSerasaFault_Exception</exception>
+					<exception>br.com.soaexpert.creditoservice.VerificaCreditoSPCFault_Exception</exception>
+					<handled>
+						<constant>false</constant>
+					</handled>
+					<to uri="vm:notificarSucessoCircuito" pattern="InOnly"/>					
+				</doCatch>
+				<doCatch>
+					<exception>java.lang.Exception</exception>
+					<handled>
+						<constant>false</constant>
+					</handled>
+					<to uri="vm:notificarFalhaCircuito" pattern="InOnly" />				
+				</doCatch>				
+			</doTry>
+		</route>
+		
+		<route>
+			<from uri="vm:notificarFalhaCircuito" />
+			
+			<setBody>
+				<groovy>
+					br.com.soaexpert.circuitbreaker.services.CircuitData data = new br.com.soaexpert.circuitbreaker.services.CircuitData();
+					data.setCircuitName(request.getHeader("operationName", java.lang.String.class));
+					data.setRequestSuccessful(false);
+					data.setDisableCircuitURL("netty-http:http://localhost:9092/jolokia/exec/org.apache.camel:context=camel%2Ctype=routes%2Cname=%22" + in.headers['operationName'] + "%22/suspend()");
+					data.setEnableCircuitURL("netty-http:http://localhost:9092/jolokia/exec/org.apache.camel:context=camel%2Ctype=routes%2Cname=%22" + in.headers['operationName'] + "%22/resume");
+					return data;
+				</groovy>
+			</setBody>
+			<marshal ref="jaxb" />
+			<to uri="rabbitmq://localhost:5672/teste?username=guest&amp;password=guest" />
+		</route>
+		
+		<route>
+			<from uri="vm:notificarSucessoCircuito" />
+			<setBody>
+				<groovy>
+					br.com.soaexpert.circuitbreaker.services.CircuitData data = new br.com.soaexpert.circuitbreaker.services.CircuitData();
+					data.setCircuitName(request.getHeader("operationName", java.lang.String.class));
+					data.setRequestSuccessful(true);
+					data.setDisableCircuitURL("netty-http:http://localhost:9092/jolokia/exec/org.apache.camel:context=camel%2Ctype=routes%2Cname=%22" + in.headers['operationName'] + "%22/suspend()");
+					data.setEnableCircuitURL("netty-http:http://localhost:9092/jolokia/exec/org.apache.camel:context=camel%2Ctype=routes%2Cname=%22" + in.headers['operationName'] + "%22/resume");
+					return data;
+				</groovy>
+			</setBody>
+			<marshal ref="jaxb" />
+			<to uri="rabbitmq://localhost:5672/teste?username=guest&amp;password=guest" />
+		</route>
+		
+		
+
+		<route id="verificaCreditoSerasa">
+			<from uri="direct:consultaSerasa" />
+			<setHeader headerName="operationName">
+				<constant>verificaCreditoSerasa</constant>
+			</setHeader>
+			<to uri="ref:verificaCreditoService" />
+
+		</route>
+
+		<route id="verificaCreditoSPC">
+			<from uri="direct:consultaSPC" />
+			<setHeader headerName="operationName">
+				<constant>verificaCreditoSPC</constant>
+			</setHeader>
+			<to uri="ref:verificaCreditoService" />
+
+		</route>
+
+		<route id="verificaCreditoCasasBahia">
+			<from uri="direct:consultaCasasBahia" />
+			<setHeader headerName="operationName">
+				<constant>verificaCreditoCasasBahia</constant>
+			</setHeader>
+			<to uri="ref:verificaCreditoService" />
+
+		</route>
+
+
+
+
+		<route>
+			<from uri="direct:checaCircuitos" />
+			<setProperty propertyName="bodyOriginal">
+				<simple>${body}</simple>
+			</setProperty>
+			<setBody>
+				<simple>${null}</simple>
+			</setBody>
+			<multicast strategyRef="agregadorResultadosCircuitos" parallelProcessing="true">
+				<to uri="netty-http://http://localhost:9090/circuitbreaker/services/circuit/verificaCreditoSPC" />
+				<to uri="netty-http://http://localhost:9090/circuitbreaker/services/circuit/verificaCreditoSerasa" />
+				<to uri="netty-http://http://localhost:9090/circuitbreaker/services/circuit/verificaCreditoCasasBahia" />
+			</multicast>
+		
+			<setBody>
+				<simple>${property.bodyOriginal}</simple>
+			</setBody>
+
+		</route>
+
+
+
+
+	</camelContext>
+
+</beans:beans>

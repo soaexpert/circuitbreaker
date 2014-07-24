@@ -61,7 +61,7 @@ public class CreditoServiceImpl implements CreditoService {
 		System.out.println("Verificando crédito no SPC");
 
 		if (empresa.getCnpj().endsWith("7")) {
-			throw new VerificaCreditoSPCFault_Exception("", new VerificaCreditoSPCFault());
+			throw new VerificaCreditoSPCFault_Exception("Erro de negócio do SPC", new VerificaCreditoSPCFault());
 		}
 
 		Credito credito = new Credito();

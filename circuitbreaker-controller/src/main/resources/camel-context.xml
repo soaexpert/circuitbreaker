@@ -265,10 +265,14 @@
 			<setHeader headerName="recipient">
 				<groovy>return exchange.in.headers['circuitData'].disableCircuitURL</groovy>
 			</setHeader>
+			<setHeader headerName="Authorization">
+				<simple>${bean:makeAuthorizationHeader}</simple>
+			</setHeader>
 			<setBody>
 				<simple>${null}</simple>
 			</setBody>
-			<log message="Invoking: ${header.recipient} " />
+			<log message="Invoking: ${header.recipient} " loggingLevel="DEBUG"/>
+			<log message="Circuit Data: ${header.circuitData} " loggingLevel="DEBUG"/>
 			<recipientList>
 				<header>recipient</header>
 			</recipientList>
@@ -277,7 +281,7 @@
 				<simple>OPEN</simple>
 			</setBody>
 			<setHeader headerName="recipient">
-				<groovy>return "etcd://http://localhost:4001?key=" + exchange.in.headers['circuitData'].circuitName + ".circuit" ;</groovy>
+				<simple>etcd://http://localhost:4001?key="${in.headers.circuitData.circuitName}".circuit" ;</simple>
 			</setHeader>
 			<log message="And now, invoking: ${header.recipient} " />
 			<recipientList>
@@ -301,12 +305,15 @@
 				<simple>${body}</simple>
 			</setHeader>
 			<setHeader headerName="recipient">
-				<groovy>return exchange.in.headers['circuitData'].enableCircuitURL</groovy>
+				<simple>etcd://http://localhost:4001?key="${in.headers.circuitData.circuitName}".circuit" ;</simple>
 			</setHeader>
 			<setBody>
 				<simple>${null}</simple>
 			</setBody>
 			<log message="Invoking: ${header.recipient} " />
+			<setHeader headerName="Authorization">
+				<simple>${bean:makeAuthorizationHeader}</simple>
+			</setHeader>
 			<recipientList>
 				<header>recipient</header>
 			</recipientList>
@@ -339,12 +346,15 @@
 				<simple>${body}</simple>
 			</setHeader>
 			<setHeader headerName="recipient">
-				<groovy>return exchange.in.headers['circuitData'].enableCircuitURL</groovy>
+				<simple>etcd://http://localhost:4001?key="${in.headers.circuitData.circuitName}".circuit" ;</simple>
 			</setHeader>
 			<setBody>
 				<simple>${null}</simple>
 			</setBody>
 			<log message="Invoking: ${header.recipient} " />
+			<setHeader headerName="Authorization">
+				<simple>${bean:makeAuthorizationHeader}</simple>
+			</setHeader>
 			<recipientList>
 				<header>recipient</header>
 			</recipientList>

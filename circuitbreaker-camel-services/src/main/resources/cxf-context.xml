@@ -1,0 +1,24 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://camel.apache.org/schema/cxf"
+	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+       http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+    ">
+
+
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+
+	<cxf:cxfEndpoint id="proxyEndpoint" address="/CreditoService"
+		serviceClass="br.com.soaexpert.services.credito.verificacao.CreditoService" />
+
+	<cxf:cxfEndpoint id="verificaCreditoService"
+		xmlns:s="http://soaexpert.com.br/CreditoService/" address="http://192.168.1.74:8099/CreditoService"
+		wsdlURL="contracts/CreditoService.wsdl" serviceClass="br.com.soaexpert.creditoservice.CreditoService"
+		serviceName="s:CreditoService" endpointName="s:CreditoServiceSOAP"></cxf:cxfEndpoint>
+
+</beans>
