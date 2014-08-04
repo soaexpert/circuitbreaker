@@ -12,11 +12,10 @@ public class AgregadorResultadosCircuitos implements AggregationStrategy {
 	@Override
 	public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
 		
-		
 		Integer responseCode = newExchange.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE, new Integer(200), Integer.class);
 		
 		if (responseCode == 503) {
-			throw new RuntimeException("Circuito est· aberto.");
+			throw new RuntimeException("Circuito est√° aberto.");
 		}
 		
 		return newExchange;
