@@ -17,7 +17,7 @@
 		serviceClass="br.com.soaexpert.services.credito.verificacao.CreditoService" />
 
 	<cxf:cxfEndpoint id="verificaCreditoService"
-		xmlns:s="http://soaexpert.com.br/CreditoService/" address="http://192.168.1.74:8099/CreditoService"
+		xmlns:s="http://soaexpert.com.br/CreditoService/" address="http://localhost:8099/CreditoService"
 		wsdlURL="contracts/CreditoService.wsdl" serviceClass="br.com.soaexpert.creditoservice.CreditoService"
 		serviceName="s:CreditoService" endpointName="s:CreditoServiceSOAP"></cxf:cxfEndpoint>
 

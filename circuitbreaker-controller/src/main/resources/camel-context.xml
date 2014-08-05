@@ -79,6 +79,7 @@
 
 		<route>
 			<from uri="seda:circuitDataFeed" />
+			<log message="Received data: ${body}" />
 			<choice>
 				<when>
 					<xpath>/circuitData/requestSuccessful = 'false'</xpath>
@@ -89,6 +90,7 @@
 					<recipientList>
 						<property>etcdUrl</property>
 					</recipientList>
+					<log message="Successfully fed etcd." />
 				</when>
 				<otherwise>
 					<setProperty propertyName="originalBody">
@@ -106,7 +108,7 @@
 						</groovy>
 					
 					</setBody>
-				
+					<log message="About to feed etcd: ${body}" />
 				
 				
 					<setProperty propertyName="changedKey">
@@ -172,10 +174,12 @@
 				</when>
 				<when>
 					<groovy>return body.action.equals("expire");</groovy>
+					<log message="Key expired. Getting circuit state..." />
 					<to uri="direct:getCircuitState" />
 					<choice>
 						<when>
 							<simple>${body} == 'OPEN'</simple>
+							<log message="Circuit is open. Getting circuit size..." />
 							<setBody>
 								<property>changedKey</property>
 							</setBody>
@@ -183,6 +187,7 @@
 							<choice>
 								<when>
 									<simple>${body} == 0</simple>
+									<log message="Circuit size is 0. Half opening the circuit..." />
 									<to uri="direct:tempEnableCircuit" />
 								</when>
 							</choice>
@@ -202,13 +207,15 @@
 
 		<route>
 			<from uri="direct:getCircuitState" />
+			<log message="Retrieving circuit state: ${body}" />
 			<setHeader headerName="recipient">
 				<groovy>return "etcd://http://localhost:4001?mode=get&amp;key=" + org.apache.commons.lang3.StringUtils.substringBetween(body.node.key, "/") + ".circuit";</groovy>
 			</setHeader>
+			<log message="Routing to endpoint: ${header.recipient}" />
 			<recipientList>
 				<header>recipient</header>
 			</recipientList>
-
+			<log message="Body is: ${body}" />
 			<choice>
 				<when>
 					<groovy>return body == null;</groovy>
@@ -259,6 +266,9 @@
 				<groovy>return body.node.value;</groovy>
 			</setBody>
 			<unmarshal ref="gson" />
+			<setProperty propertyName="circuitData">
+				<simple>${body}</simple>
+			</setProperty>
 			<setHeader headerName="circuitData">
 				<simple>${body}</simple>
 			</setHeader>
@@ -271,8 +281,8 @@
 			<setBody>
 				<simple>${null}</simple>
 			</setBody>
-			<log message="Invoking: ${header.recipient} " loggingLevel="DEBUG"/>
-			<log message="Circuit Data: ${header.circuitData} " loggingLevel="DEBUG"/>
+			<log message="Invoking: ${header.recipient} "/>
+			<log message="Circuit Data: ${header.circuitData} " />
 			<recipientList>
 				<header>recipient</header>
 			</recipientList>
@@ -280,8 +290,10 @@
 			<setBody>
 				<simple>OPEN</simple>
 			</setBody>
+			<process ref="interceptor" />
 			<setHeader headerName="recipient">
-				<simple>etcd://http://localhost:4001?key="${in.headers.circuitData.circuitName}".circuit" ;</simple>
+				<groovy>return "etcd://http://localhost:4001?key=" + exchange.properties['circuitData'].circuitName + ".circuit";</groovy>
+<!-- 				<simple>etcd://http://localhost:4001?key=${header.circuitData.circuitName}.circuit</simple> -->
 			</setHeader>
 			<log message="And now, invoking: ${header.recipient} " />
 			<recipientList>
@@ -301,29 +313,33 @@
 				<groovy>return body.prevNode.value;</groovy>
 			</setBody>
 			<unmarshal ref="gson" />
+			<setProperty propertyName="circuitData">
+				<simple>${body}</simple>
+			</setProperty>
 			<setHeader headerName="circuitData">
 				<simple>${body}</simple>
 			</setHeader>
 			<setHeader headerName="recipient">
-				<simple>etcd://http://localhost:4001?key="${in.headers.circuitData.circuitName}".circuit" ;</simple>
+				<groovy>return "etcd://http://localhost:4001?key=" + exchange.properties['circuitData'].circuitName + ".circuit";</groovy>
 			</setHeader>
 			<setBody>
-				<simple>${null}</simple>
+				<simple>HALF-OPEN</simple>
 			</setBody>
-			<log message="Invoking: ${header.recipient} " />
 			<setHeader headerName="Authorization">
 				<simple>${bean:makeAuthorizationHeader}</simple>
 			</setHeader>
+			<log message="Invoking: ${header.recipient} " />
 			<recipientList>
 				<header>recipient</header>
 			</recipientList>
 
-			<setBody>
-				<simple>HALF-OPEN</simple>
-			</setBody>
 			<setHeader headerName="recipient">
-				<groovy>return "etcd://http://localhost:4001?key=" + exchange.in.headers['circuitData'].circuitName + ".circuit" ;</groovy>
+				<groovy>return exchange.properties['circuitData'].enableCircuitURL;</groovy>
 			</setHeader>
+			<setBody>
+				<simple>${null}</simple>
+			</setBody>
+			
 			<log message="And now, invoking: ${header.recipient} " />
 			<recipientList>
 				<header>recipient</header>
@@ -342,19 +358,22 @@
 				<groovy>return body.node.value;</groovy>
 			</setBody>
 			<unmarshal ref="gson" />
+			<setProperty propertyName="circuitData">
+				<simple>${body}</simple>
+			</setProperty>
 			<setHeader headerName="circuitData">
 				<simple>${body}</simple>
 			</setHeader>
 			<setHeader headerName="recipient">
-				<simple>etcd://http://localhost:4001?key="${in.headers.circuitData.circuitName}".circuit" ;</simple>
+				<groovy>return exchange.properties['circuitData'].enableCircuitURL;</groovy>
 			</setHeader>
 			<setBody>
 				<simple>${null}</simple>
 			</setBody>
-			<log message="Invoking: ${header.recipient} " />
 			<setHeader headerName="Authorization">
 				<simple>${bean:makeAuthorizationHeader}</simple>
 			</setHeader>
+			<log message="Invoking: ${header.recipient} " />
 			<recipientList>
 				<header>recipient</header>
 			</recipientList>
@@ -363,7 +382,7 @@
 				<simple>CLOSED</simple>
 			</setBody>
 			<setHeader headerName="recipient">
-				<groovy>return "etcd://http://localhost:4001?key=" + exchange.in.headers['circuitData'].circuitName + ".circuit" ;</groovy>
+				<groovy>return "etcd://http://localhost:4001?key=" + exchange.properties['circuitData'].circuitName + ".circuit" ;</groovy>
 			</setHeader>
 			<log message="And now, invoking: ${header.recipient} " />
 			<recipientList>
